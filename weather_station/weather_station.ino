@@ -13,7 +13,7 @@ void setup_wifi()
   while (true)
   {
     // Try to connect to ssid with given password
-    WiFi.begin(ssid, password);
+    WiFi.begin(SSID, WIFI_PWD);
 
     delay(1000);
     Serial.println("Trying to connect to WiFi ...");
@@ -23,7 +23,7 @@ void setup_wifi()
     {
     case WL_CONNECTED:
       Serial.print("Successfully connected to ");
-      Serial.print(ssid);
+      Serial.print(SSID);
       Serial.println(" WiFi");
       return;
       break;
@@ -33,13 +33,13 @@ void setup_wifi()
       break;
     case WL_CONNECT_FAILED:
       Serial.print("Failed to connect to ");
-      Serial.print(ssid);
+      Serial.print(SSID);
       Serial.println(" WiFi");
       return;
       break;
     case WL_NO_SSID_AVAIL:
       Serial.print("No SSID are available for ");
-      Serial.println(ssid);
+      Serial.println(SSID);
       return;
       break;
     case WL_IDLE_STATUS:
