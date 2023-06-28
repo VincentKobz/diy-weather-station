@@ -123,12 +123,6 @@ void loop() {
     delay(1000);
   }
 
-  // Check if client is connected to the mqtt server
-  if (!client.connected())
-  {
-    reconnect();
-  }
-
   // Read humidity
   float humidity_data = dht.readHumidity();
   // Read temperature
