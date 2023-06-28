@@ -3,11 +3,11 @@
 
 #define DHT_PIN 23
 #define DHT_TYPE DHT22
+#define SSID "ssid"
+#define WIFI_PWD "password"
 
-const char *ssid = "ssid";
-const char *password = "password";
+WiFiClient wifi_client;
 
 static DHT dht(DHT_PIN, DHT_TYPE);
-static WiFiClient wifi_client;
 
 #endif // GLOBAL_DATA_H
