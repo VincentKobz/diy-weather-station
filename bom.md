@@ -15,5 +15,5 @@ Sensors:
 
 ### Schematic
 
-![schematic](resources/electrical_circuit_v1.png)
+![schematic](resources/electrical_circuit_v1.png)\
 Electrical circuit of weather-station V1
