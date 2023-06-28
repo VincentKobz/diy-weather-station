@@ -4,6 +4,27 @@
 
 #include "global_data.h"
 
+// Try to publish data into topic
+void try_publish(char *topic, const char *data)
+{
+  if (!client.connected())
+  {
+    reconnect();
+  }
+  if (!client.publish(topic, data))
+  {
+    Serial.print("Failed to publish into ");
+    Serial.println(topic);
+  }
+  else
+  {
+    Serial.print("Successfully publish ");
+    Serial.print(data);
+    Serial.print(" into ");
+    Serial.println(topic);
+  }
+}
+
 // Mqtt callback
 void callback(char* topic, byte* payload, unsigned int length)
 {
@@ -13,13 +34,15 @@ void callback(char* topic, byte* payload, unsigned int length)
 // Reconnect ESP32 to the mqtt server
 void reconnect()
 {
-  while (!client.connected())
+  if (!client.connect(MQTT_DEVICE_ID))
   {
-    client.connect(MQTT_DEVICE_ID);
     Serial.println("Failed to connect to MQTT broker !");
     Serial.println(client.state());
   }
-  Serial.println("Successfully connected to MQTT broker !");
+  else
+  {
+    Serial.println("Successfully connected to MQTT broker !");
+  }
 }
 
 // Setup mqtt broker
@@ -111,9 +134,7 @@ void loop() {
   // Read temperature
   float temperature_data = dht.readTemperature();
 
-  // Pretty print in serial console
-  Serial.print("Humidity: ");
-  Serial.println(humidity_data);
-  Serial.print("Temprature: ");
-  Serial.println(temperature_data);
+  // Try to publish data into mqtt topics
+  try_publish("esp32/out/temperature", String(temperature_data).c_str());
+  try_publish("esp32/out/humidity", String(humidity_data).c_str());
 }
