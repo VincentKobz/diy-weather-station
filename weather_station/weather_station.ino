@@ -4,6 +4,31 @@
 
 #include "global_data.h"
 
+// Mqtt callback
+void callback(char* topic, byte* payload, unsigned int length)
+{
+  Serial.println("Message received !");
+}
+
+// Reconnect ESP32 to the mqtt server
+void reconnect()
+{
+  while (!client.connected())
+  {
+    client.connect(MQTT_DEVICE_ID);
+    Serial.println("Failed to connect to MQTT broker !");
+    Serial.println(client.state());
+  }
+  Serial.println("Successfully connected to MQTT broker !");
+}
+
+// Setup mqtt broker
+void setup_mqtt_broker()
+{
+  client.setServer(MQTT_SERVER_IP, MQTT_PORT);
+  client.setCallback(callback);
+}
+
 // Connect ESP32 to a WiFi hotspot
 void setup_wifi()
 {
@@ -59,6 +84,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println("ESP32 ready !");
   setup_wifi();
+  setup_mqtt_broker();
   dht.begin();
 }
 
@@ -71,7 +97,13 @@ void loop() {
   while (WiFi.status() != WL_CONNECTED)
   {
     setup_wifi();
-    delay(10000);
+    delay(1000);
+  }
+
+  // Check if client is connected to the mqtt server
+  if (!client.connected())
+  {
+    reconnect();
   }
 
   // Read humidity
