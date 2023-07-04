@@ -129,6 +129,12 @@ void loop() {
   float temperature_data = dht.readTemperature();
 
   // Try to publish data into mqtt topics
-  try_publish("esp32/out/temperature", String(temperature_data).c_str());
-  try_publish("esp32/out/humidity", String(humidity_data).c_str());
+  char temperature[5];
+  snprintf(temperature, 5, "%f", temperature_data);
+
+  char humidity[5];
+  snprintf(humidity, 5, "%f", humidity_data);
+
+  try_publish("esp32/out/temperature", temperature);
+  try_publish("esp32/out/humidity", humidity);
 }
