@@ -20,8 +20,7 @@ char *convert_float_to_string(float value, char *string)
 
   // Reset string
   memset(string, '\0', 100);
-
-
+  // Fill string
   snprintf(string, 100, "%f", value);
 
   return string;
