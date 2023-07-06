@@ -1,6 +1,7 @@
 #include "DHT.h"
 #include "WiFi.h"
 #include "PubSubClient.h"
+#include <MQUnifiedsensor.h>
 
 #include "global_data.h"
 
@@ -43,6 +44,23 @@ void reconnect()
   {
     Serial.println("Successfully connected to MQTT broker !");
   }
+}
+
+// Setup MQ135
+void setup_mq135()
+{
+  MQ135.setRegressionMethod(1);
+  MQ135.init();
+
+  // MQ135 Calibration
+  float calcR0 = 0;
+
+  for(int i = 1; i<=10; i ++)
+  {
+    MQ135.update();
+    calcR0 += MQ135.calibrate(RATIO_MQ135_CLEAN_AIR);
+  }
+  MQ135.setR0(calcR0/10);
 }
 
 // Setup mqtt broker
@@ -109,6 +127,7 @@ void setup() {
   setup_wifi();
   setup_mqtt_broker();
   dht.begin();
+  setup_mq135();
 }
 
 // Main loop
@@ -137,4 +156,42 @@ void loop() {
 
   try_publish("esp32/out/temperature", temperature);
   try_publish("esp32/out/humidity", humidity);
+
+  MQ135.update();
+
+  // Get CO
+  MQ135.setA(605.18); MQ135.setB(-3.937);
+  float co = MQ135.readSensor();
+  Serial.print("CO: ");
+  Serial.println(co);
+
+  // Get Alcohol
+  MQ135.setA(77.255); MQ135.setB(-3.18);
+  float alcohol = MQ135.readSensor();
+  Serial.print("Alcohol: ");
+  Serial.println(alcohol);
+
+  // Get co2
+  MQ135.setA(110.47); MQ135.setB(-2.862);
+  float co2 = MQ135.readSensor() + 400;
+  Serial.print("CO2: ");
+  Serial.println(co2);
+
+  // Get Toluen
+  MQ135.setA(44.947); MQ135.setB(-3.445);
+  float toluen = MQ135.readSensor();
+  Serial.print("Toluen: ");
+  Serial.println(toluen);
+
+  // Get NH4
+  MQ135.setA(102.2 ); MQ135.setB(-2.473);
+  float nh4 = MQ135.readSensor();
+  Serial.print("Nh4: ");
+  Serial.println(nh4);
+
+  // Get Aceton
+  MQ135.setA(34.668); MQ135.setB(-3.369);
+  float aceton = MQ135.readSensor();
+  Serial.print("Aceton: ");
+  Serial.println(aceton);
 }
