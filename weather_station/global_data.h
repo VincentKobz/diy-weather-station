@@ -22,5 +22,6 @@ PubSubClient client(wifi_client);
 MQUnifiedsensor MQ135(BOARD, VOLTAGE_RESOLUTION, ADC_BIT_RESOLUTION, PIN, TYPE);
 
 static DHT dht(DHT_PIN, DHT_TYPE);
+static char *sensor_data = NULL;
 
 #endif // GLOBAL_DATA_H

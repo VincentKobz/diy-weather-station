@@ -1,9 +1,31 @@
 #include "DHT.h"
 #include "WiFi.h"
+#include <stdlib.h>
 #include "PubSubClient.h"
 #include <MQUnifiedsensor.h>
 
 #include "global_data.h"
+
+char *convert_float_to_string(float value, char *string)
+{
+  if (!string)
+  {
+    string = (char *)calloc(100, sizeof(char));
+  }
+
+  if (!string)
+  {
+    return NULL;
+  }
+
+  // Reset string
+  memset(string, '\0', 100);
+
+
+  snprintf(string, 100, "%f", value);
+
+  return string;
+}
 
 // Try to publish data into topic
 void try_publish(char *topic, const char *data)
@@ -148,50 +170,47 @@ void loop() {
   float temperature_data = dht.readTemperature();
 
   // Try to publish data into mqtt topics
-  char temperature[5];
-  snprintf(temperature, 5, "%f", temperature_data);
+  sensor_data = convert_float_to_string(temperature_data, sensor_data);
+  try_publish("esp32/out/temperature", sensor_data);
 
-  char humidity[5];
-  snprintf(humidity, 5, "%f", humidity_data);
-
-  try_publish("esp32/out/temperature", temperature);
-  try_publish("esp32/out/humidity", humidity);
+  sensor_data = convert_float_to_string(humidity_data, sensor_data);
+  try_publish("esp32/out/humidity", sensor_data);
 
   MQ135.update();
 
   // Get CO
   MQ135.setA(605.18); MQ135.setB(-3.937);
   float co = MQ135.readSensor();
-  Serial.print("CO: ");
-  Serial.println(co);
+  sensor_data = convert_float_to_string(co, sensor_data);
+  try_publish("esp32/out/co", sensor_data);
 
   // Get Alcohol
   MQ135.setA(77.255); MQ135.setB(-3.18);
   float alcohol = MQ135.readSensor();
-  Serial.print("Alcohol: ");
-  Serial.println(alcohol);
+  sensor_data = convert_float_to_string(alcohol, sensor_data);
+  try_publish("esp32/out/alcohol", sensor_data);
 
   // Get co2
   MQ135.setA(110.47); MQ135.setB(-2.862);
   float co2 = MQ135.readSensor() + 400;
-  Serial.print("CO2: ");
-  Serial.println(co2);
+  sensor_data = convert_float_to_string(co2, sensor_data);
+  try_publish("esp32/out/co2", sensor_data);
 
   // Get Toluen
   MQ135.setA(44.947); MQ135.setB(-3.445);
   float toluen = MQ135.readSensor();
-  Serial.print("Toluen: ");
-  Serial.println(toluen);
+  sensor_data = convert_float_to_string(toluen, sensor_data);
+  try_publish("esp32/out/toluen", sensor_data);
 
   // Get NH4
   MQ135.setA(102.2 ); MQ135.setB(-2.473);
   float nh4 = MQ135.readSensor();
-  Serial.print("Nh4: ");
-  Serial.println(nh4);
+  sensor_data = convert_float_to_string(nh4, sensor_data);
+  try_publish("esp32/out/nh4", sensor_data);
 
   // Get Aceton
   MQ135.setA(34.668); MQ135.setB(-3.369);
   float aceton = MQ135.readSensor();
-  Serial.print("Aceton: ");
-  Serial.println(aceton);
+  sensor_data = convert_float_to_string(aceton, sensor_data);
+  try_publish("esp32/out/aceton", sensor_data);
 }
