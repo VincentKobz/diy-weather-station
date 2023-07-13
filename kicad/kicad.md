@@ -8,7 +8,7 @@ Schematic and pcb design of my board were created using [Kicad](https://www.kica
 
 Kicad project requires footprints and symbols librairies.
 
-Here is the list of these librairies, which can be downloaded from SnapEDA.
+Here is the list of these librairies, which can be downloaded from [SnapEDA](https://www.snapeda.com/).
 
 - [bmp180](https://www.snapeda.com/parts/HTSW-106-07-S-S-LL/Samtec/view-part/?t=HTSW-106-07-S-S-LL)
 - [bob-12009](https://www.snapeda.com/parts/BOB-12009/SparkFun/view-part/?t=bob12009)
