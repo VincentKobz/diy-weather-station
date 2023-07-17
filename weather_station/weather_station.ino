@@ -80,8 +80,9 @@ void reconnect()
 {
   if (!client.connect(MQTT_DEVICE_ID))
   {
-    Serial.println("Failed to connect to MQTT broker !");
-    Serial.println(client.state());
+    static char message[100];
+    snprintf(message, 100, "Failed to connect to MQTT broker, error [%i] !", client.state());
+    Serial.println(message);
   }
   else
   {
@@ -118,6 +119,7 @@ void setup_wifi()
 {
   // Set connection to access point
   WiFi.mode(WIFI_STA);
+  char message[100];
 
   while (true)
   {
@@ -131,9 +133,8 @@ void setup_wifi()
     switch (WiFi.status())
     {
     case WL_CONNECTED:
-      Serial.print("Successfully connected to ");
-      Serial.print(SSID);
-      Serial.println(" WiFi");
+      snprintf(message, 100, "Successfully connected to %s WiFi !", SSID);
+      Serial.println(message);
       return;
       break;
     case WL_NO_SHIELD:
@@ -141,22 +142,21 @@ void setup_wifi()
       return;
       break;
     case WL_CONNECT_FAILED:
-      Serial.print("Failed to connect to ");
-      Serial.print(SSID);
-      Serial.println(" WiFi");
+      snprintf(message, 100, "Failed to connect to %s WiFi !", SSID);
+      Serial.println(message);
       return;
       break;
     case WL_NO_SSID_AVAIL:
-      Serial.print("No SSID are available for ");
-      Serial.println(SSID);
+      snprintf(message, 100, "No SSID are available for %s !", SSID);
+      Serial.println(message);
       return;
       break;
     case WL_IDLE_STATUS:
       Serial.println("Retry to connect to WiFi !");
       break;
     default:
-      Serial.print("Error during WiFi connection ");
-      Serial.println(WiFi.status());
+      snprintf(message, 100, "Error during WiFi connection [%i] !", WiFi.status());
+      Serial.println(message);
       return;
       break;
     }
