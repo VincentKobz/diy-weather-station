@@ -6,6 +6,28 @@
 
 #include "global_data.h"
 
+void get_air_quality(float value)
+{
+  char *air_quality = NULL;
+  if (value <= 600)
+  {
+    air_quality = "good";
+  }
+  else if (value <= 800)
+  {
+    air_quality = "acceptable";
+  }
+  else if (value <= 1000)
+  {
+    air_quality = "mediocre";
+  }
+  else
+  {
+    air_quality = "bad";
+  }
+  try_publish("esp32/out/air-quality", air_quality);
+}
+
 char *convert_float_to_string(float value, char *string)
 {
   if (!string)
