@@ -188,17 +188,18 @@ void loop() {
     delay(1000);
   }
 
+  // [DHT22]
+
   // Read humidity
   float humidity_data = dht.readHumidity();
+  sensor_data = convert_float_to_string(humidity_data, sensor_data);
+  try_publish("esp32/out/humidity", sensor_data);
   // Read temperature
   float temperature_data = dht.readTemperature();
-
-  // Try to publish data into MQTT topics
   sensor_data = convert_float_to_string(temperature_data, sensor_data);
   try_publish("esp32/out/temperature", sensor_data);
 
-  sensor_data = convert_float_to_string(humidity_data, sensor_data);
-  try_publish("esp32/out/humidity", sensor_data);
+  // [MQ135]
 
   MQ135.update();
 
@@ -237,6 +238,8 @@ void loop() {
   float aceton = MQ135.readSensor();
   sensor_data = convert_float_to_string(aceton, sensor_data);
   try_publish("esp32/out/aceton", sensor_data);
+
+  // [BMP180]
 
   // Air pressure
   float pressure = bmp180.readPressure();
