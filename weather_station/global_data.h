@@ -28,5 +28,6 @@ MQUnifiedsensor MQ135(BOARD, VOLTAGE_RESOLUTION, ADC_BIT_RESOLUTION, PIN, TYPE);
 
 static DHT dht(DHT_PIN, DHT_TYPE);
 static char *sensor_data = NULL;
+static Adafruit_BMP085 bmp180;
 
 #endif // GLOBAL_DATA_H

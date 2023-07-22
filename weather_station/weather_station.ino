@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "PubSubClient.h"
 #include <MQUnifiedsensor.h>
+#include <Wire.h>
+#include <Adafruit_BMP085.h>
 
 #include "global_data.h"
 
@@ -235,4 +237,14 @@ void loop() {
   float aceton = MQ135.readSensor();
   sensor_data = convert_float_to_string(aceton, sensor_data);
   try_publish("esp32/out/aceton", sensor_data);
+
+  // Air pressure
+  float pressure = bmp180.readPressure();
+  sensor_data = convert_float_to_string(pressure, sensor_data);
+  try_publish("esp32/out/pressure", sensor_data);
+
+  // Altitude (considering that sea level has pressure of 10132 Pascal)
+  float altitude = bmp180.readAltitude();
+  sensor_data = convert_float_to_string(altitude, sensor_data);
+  try_publish("esp32/out/altitude", sensor_data);
 }
