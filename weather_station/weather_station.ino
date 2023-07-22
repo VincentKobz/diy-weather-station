@@ -53,21 +53,20 @@ char *convert_float_to_string(float value, char *string)
 // Try to publish data into MQTT topic
 void try_publish(char *topic, const char *data)
 {
+  char message[100];
   if (!client.connected())
   {
     reconnect();
   }
   if (!client.publish(topic, data))
   {
-    Serial.print("Failed to publish into ");
-    Serial.println(topic);
+    snprintf(message, 100, "Failed to publish into %s\n", topic);
+    Serial.println(message);
   }
   else
   {
-    Serial.print("Successfully publish ");
-    Serial.print(data);
-    Serial.print(" into ");
-    Serial.println(topic);
+    snprintf(message, 100, "Successfully publish %s into %s\n", data, topic);
+    Serial.println(message);
   }
 }
 
