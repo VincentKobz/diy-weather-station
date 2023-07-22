@@ -6,6 +6,7 @@
 
 #include "global_data.h"
 
+// Classify CO2 ppm value to obtain air quality
 void get_air_quality(float value)
 {
   char *air_quality = NULL;
@@ -28,6 +29,7 @@ void get_air_quality(float value)
   try_publish("esp32/out/air-quality", air_quality);
 }
 
+// Convert float to string
 char *convert_float_to_string(float value, char *string)
 {
   if (!string)
@@ -48,7 +50,7 @@ char *convert_float_to_string(float value, char *string)
   return string;
 }
 
-// Try to publish data into topic
+// Try to publish data into MQTT topic
 void try_publish(char *topic, const char *data)
 {
   if (!client.connected())
@@ -69,13 +71,13 @@ void try_publish(char *topic, const char *data)
   }
 }
 
-// Mqtt callback
+// MQTT callback
 void callback(char* topic, byte* payload, unsigned int length)
 {
   Serial.println("Message received !");
 }
 
-// Reconnect ESP32 to the mqtt server
+// Reconnect ESP32 to the MQTT server
 void reconnect()
 {
   if (!client.connect(MQTT_DEVICE_ID))
@@ -107,14 +109,14 @@ void setup_mq135()
   MQ135.setR0(calcR0/10);
 }
 
-// Setup mqtt broker
+// Setup MQTT broker
 void setup_mqtt_broker()
 {
   client.setServer(MQTT_SERVER_IP, MQTT_PORT);
   client.setCallback(callback);
 }
 
-// Connect ESP32 to a WiFi hotspot
+// Connect ESP32 to a Wi-Fi hotspot
 void setup_wifi()
 {
   // Set connection to access point
@@ -123,13 +125,13 @@ void setup_wifi()
 
   while (true)
   {
-    // Try to connect to ssid with given password
+    // Try to connect to SSID with given password
     WiFi.begin(SSID, WIFI_PWD);
 
     delay(1000);
     Serial.println("Trying to connect to WiFi ...");
 
-    // Check WiFi status
+    // Check Wi-Fi status
     switch (WiFi.status())
     {
     case WL_CONNECTED:
@@ -178,7 +180,7 @@ void loop() {
   // Wait for sensor
   delay(2000);
 
-  // Check if WiFi is connected
+  // Check if Wi-Fi is connected
   while (WiFi.status() != WL_CONNECTED)
   {
     setup_wifi();
@@ -190,7 +192,7 @@ void loop() {
   // Read temperature
   float temperature_data = dht.readTemperature();
 
-  // Try to publish data into mqtt topics
+  // Try to publish data into MQTT topics
   sensor_data = convert_float_to_string(temperature_data, sensor_data);
   try_publish("esp32/out/temperature", sensor_data);
 
