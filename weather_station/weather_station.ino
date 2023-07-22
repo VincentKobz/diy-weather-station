@@ -53,7 +53,7 @@ char *convert_float_to_string(float value, char *string)
 }
 
 // Try to publish data into MQTT topic
-void try_publish(char *topic, const char *data)
+void try_publish(const char *topic, const char *data)
 {
   char message[100];
   if (!client.connected())
@@ -70,6 +70,12 @@ void try_publish(char *topic, const char *data)
     snprintf(message, 100, "Successfully publish %s into %s\n", data, topic);
     Serial.println(message);
   }
+}
+
+void try_publish_float(const char *topic, float data)
+{
+  sensor_data = convert_float_to_string(data, sensor_data);
+  try_publish(topic, sensor_data);
 }
 
 // MQTT callback
@@ -191,13 +197,9 @@ void loop() {
   // [DHT22]
 
   // Read humidity
-  float humidity_data = dht.readHumidity();
-  sensor_data = convert_float_to_string(humidity_data, sensor_data);
-  try_publish("esp32/out/humidity", sensor_data);
+  try_publish_float("esp32/out/humidity", dht.readHumidity());
   // Read temperature
-  float temperature_data = dht.readTemperature();
-  sensor_data = convert_float_to_string(temperature_data, sensor_data);
-  try_publish("esp32/out/temperature", sensor_data);
+  try_publish_float("esp32/out/temperature", dht.readTemperature());
 
   // [MQ135]
 
@@ -205,49 +207,33 @@ void loop() {
 
   // Get CO
   MQ135.setA(605.18); MQ135.setB(-3.937);
-  float co = MQ135.readSensor();
-  sensor_data = convert_float_to_string(co, sensor_data);
-  try_publish("esp32/out/co", sensor_data);
+  try_publish_float("esp32/out/co", MQ135.readSensor());
 
   // Get Alcohol
   MQ135.setA(77.255); MQ135.setB(-3.18);
-  float alcohol = MQ135.readSensor();
-  sensor_data = convert_float_to_string(alcohol, sensor_data);
-  try_publish("esp32/out/alcohol", sensor_data);
+  try_publish_float("esp32/out/alcohol", MQ135.readSensor());
 
   // Get co2
   MQ135.setA(110.47); MQ135.setB(-2.862);
-  float co2 = MQ135.readSensor() + 400;
-  sensor_data = convert_float_to_string(co2, sensor_data);
-  try_publish("esp32/out/co2", sensor_data);
+  try_publish_float("esp32/out/co2", MQ135.readSensor() + 400);
 
   // Get Toluen
   MQ135.setA(44.947); MQ135.setB(-3.445);
-  float toluen = MQ135.readSensor();
-  sensor_data = convert_float_to_string(toluen, sensor_data);
-  try_publish("esp32/out/toluen", sensor_data);
+  try_publish_float("esp32/out/toluen", MQ135.readSensor());
 
   // Get NH4
   MQ135.setA(102.2 ); MQ135.setB(-2.473);
-  float nh4 = MQ135.readSensor();
-  sensor_data = convert_float_to_string(nh4, sensor_data);
-  try_publish("esp32/out/nh4", sensor_data);
+  try_publish_float("esp32/out/nh4", MQ135.readSensor());
 
   // Get Aceton
   MQ135.setA(34.668); MQ135.setB(-3.369);
-  float aceton = MQ135.readSensor();
-  sensor_data = convert_float_to_string(aceton, sensor_data);
-  try_publish("esp32/out/aceton", sensor_data);
+  try_publish_float("esp32/out/aceton", MQ135.readSensor());
 
   // [BMP180]
 
   // Air pressure
-  float pressure = bmp180.readPressure();
-  sensor_data = convert_float_to_string(pressure, sensor_data);
-  try_publish("esp32/out/pressure", sensor_data);
+  try_publish_float("esp32/out/pressure", bmp180.readPressure());
 
   // Altitude (considering that sea level has pressure of 10132 Pascal)
-  float altitude = bmp180.readAltitude();
-  sensor_data = convert_float_to_string(altitude, sensor_data);
-  try_publish("esp32/out/altitude", sensor_data);
+  try_publish_float("esp32/out/altitude", bmp180.readAltitude());
 }
