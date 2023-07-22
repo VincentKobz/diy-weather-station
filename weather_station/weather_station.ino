@@ -6,6 +6,7 @@
 
 #include "global_data.h"
 
+// Classify CO2 ppm value to obtain air quality
 void get_air_quality(float value)
 {
   char *air_quality = NULL;
@@ -28,6 +29,7 @@ void get_air_quality(float value)
   try_publish("esp32/out/air-quality", air_quality);
 }
 
+// Convert float to string
 char *convert_float_to_string(float value, char *string)
 {
   if (!string)
@@ -48,40 +50,40 @@ char *convert_float_to_string(float value, char *string)
   return string;
 }
 
-// Try to publish data into topic
+// Try to publish data into MQTT topic
 void try_publish(char *topic, const char *data)
 {
+  char message[100];
   if (!client.connected())
   {
     reconnect();
   }
   if (!client.publish(topic, data))
   {
-    Serial.print("Failed to publish into ");
-    Serial.println(topic);
+    snprintf(message, 100, "Failed to publish into %s\n", topic);
+    Serial.println(message);
   }
   else
   {
-    Serial.print("Successfully publish ");
-    Serial.print(data);
-    Serial.print(" into ");
-    Serial.println(topic);
+    snprintf(message, 100, "Successfully publish %s into %s\n", data, topic);
+    Serial.println(message);
   }
 }
 
-// Mqtt callback
+// MQTT callback
 void callback(char* topic, byte* payload, unsigned int length)
 {
   Serial.println("Message received !");
 }
 
-// Reconnect ESP32 to the mqtt server
+// Reconnect ESP32 to the MQTT server
 void reconnect()
 {
   if (!client.connect(MQTT_DEVICE_ID))
   {
-    Serial.println("Failed to connect to MQTT broker !");
-    Serial.println(client.state());
+    static char message[100];
+    snprintf(message, 100, "Failed to connect to MQTT broker, error [%i] !", client.state());
+    Serial.println(message);
   }
   else
   {
@@ -106,34 +108,34 @@ void setup_mq135()
   MQ135.setR0(calcR0/10);
 }
 
-// Setup mqtt broker
+// Setup MQTT broker
 void setup_mqtt_broker()
 {
   client.setServer(MQTT_SERVER_IP, MQTT_PORT);
   client.setCallback(callback);
 }
 
-// Connect ESP32 to a WiFi hotspot
+// Connect ESP32 to a Wi-Fi hotspot
 void setup_wifi()
 {
   // Set connection to access point
   WiFi.mode(WIFI_STA);
+  char message[100];
 
   while (true)
   {
-    // Try to connect to ssid with given password
+    // Try to connect to SSID with given password
     WiFi.begin(SSID, WIFI_PWD);
 
     delay(1000);
     Serial.println("Trying to connect to WiFi ...");
 
-    // Check WiFi status
+    // Check Wi-Fi status
     switch (WiFi.status())
     {
     case WL_CONNECTED:
-      Serial.print("Successfully connected to ");
-      Serial.print(SSID);
-      Serial.println(" WiFi");
+      snprintf(message, 100, "Successfully connected to %s WiFi !", SSID);
+      Serial.println(message);
       return;
       break;
     case WL_NO_SHIELD:
@@ -141,22 +143,21 @@ void setup_wifi()
       return;
       break;
     case WL_CONNECT_FAILED:
-      Serial.print("Failed to connect to ");
-      Serial.print(SSID);
-      Serial.println(" WiFi");
+      snprintf(message, 100, "Failed to connect to %s WiFi !", SSID);
+      Serial.println(message);
       return;
       break;
     case WL_NO_SSID_AVAIL:
-      Serial.print("No SSID are available for ");
-      Serial.println(SSID);
+      snprintf(message, 100, "No SSID are available for %s !", SSID);
+      Serial.println(message);
       return;
       break;
     case WL_IDLE_STATUS:
       Serial.println("Retry to connect to WiFi !");
       break;
     default:
-      Serial.print("Error during WiFi connection ");
-      Serial.println(WiFi.status());
+      snprintf(message, 100, "Error during WiFi connection [%i] !", WiFi.status());
+      Serial.println(message);
       return;
       break;
     }
@@ -178,7 +179,7 @@ void loop() {
   // Wait for sensor
   delay(2000);
 
-  // Check if WiFi is connected
+  // Check if Wi-Fi is connected
   while (WiFi.status() != WL_CONNECTED)
   {
     setup_wifi();
@@ -190,7 +191,7 @@ void loop() {
   // Read temperature
   float temperature_data = dht.readTemperature();
 
-  // Try to publish data into mqtt topics
+  // Try to publish data into MQTT topics
   sensor_data = convert_float_to_string(temperature_data, sensor_data);
   try_publish("esp32/out/temperature", sensor_data);
 
