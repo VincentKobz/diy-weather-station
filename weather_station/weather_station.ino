@@ -180,6 +180,11 @@ void setup() {
   setup_mqtt_broker();
   dht.begin();
   setup_mq135();
+
+  while (!bmp180.begin())
+  {
+    Serial.println("Bmp180 not find !");
+  }
 }
 
 // Main loop
