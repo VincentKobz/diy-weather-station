@@ -15,6 +15,7 @@ It features the following sensors:
 - temperature
 - humidity
 - pressure
+- altitude
 - gas (Ammonia, Nitrogen Oxide, Alcohol, Benzene, Co2, CO ...)
 
 This GitHub repository describes the entire project, from the choice of components to the software.
