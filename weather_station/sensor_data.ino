@@ -48,7 +48,9 @@ void get_mq135_data()
 
   // Get co2
   MQ135.setA(110.47); MQ135.setB(-2.862);
-  try_publish_float("esp32/out/co2", MQ135.readSensor() + 400);
+  float co2_value = MQ135.readSensor() + 400;
+  get_air_quality(co2_value);
+  try_publish_float("esp32/out/co2", co2_value);
 
   // Get Toluen
   MQ135.setA(44.947); MQ135.setB(-3.445);
