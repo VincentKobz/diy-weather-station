@@ -1,6 +1,12 @@
 #ifndef GLOBAL_DATA_H
 #define GLOBAL_DATA_H
 
+#include "DHT.h"
+#include "WiFi.h"
+#include "PubSubClient.h"
+#include <MQUnifiedsensor.h>
+#include <Adafruit_BMP085.h>
+
 // DHT22
 #define DHT_PIN 23
 #define DHT_TYPE DHT22
@@ -30,4 +36,4 @@ static DHT dht(DHT_PIN, DHT_TYPE);
 static char *sensor_data = NULL;
 static Adafruit_BMP085 bmp180;
 
-#endif // GLOBAL_DATA_H
+#endif /* GLOBAL_DATA_H */

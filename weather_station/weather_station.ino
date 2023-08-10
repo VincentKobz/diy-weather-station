@@ -1,35 +1,7 @@
-#include "DHT.h"
-#include "WiFi.h"
+#include "global_data_2.h"
+#include "sensor_data.h"
 #include <stdlib.h>
-#include "PubSubClient.h"
-#include <MQUnifiedsensor.h>
 #include <Wire.h>
-#include <Adafruit_BMP085.h>
-
-#include "global_data.h"
-
-// Classify CO2 ppm value to obtain air quality
-void get_air_quality(float value)
-{
-  char *air_quality = NULL;
-  if (value <= 600)
-  {
-    air_quality = "good";
-  }
-  else if (value <= 800)
-  {
-    air_quality = "acceptable";
-  }
-  else if (value <= 1000)
-  {
-    air_quality = "mediocre";
-  }
-  else
-  {
-    air_quality = "bad";
-  }
-  try_publish("esp32/out/air-quality", air_quality);
-}
 
 // Convert float to string
 char *convert_float_to_string(float value, char *string)
@@ -50,53 +22,6 @@ char *convert_float_to_string(float value, char *string)
   snprintf(string, 100, "%f", value);
 
   return string;
-}
-
-// Try to publish data into MQTT topic
-void try_publish(const char *topic, const char *data)
-{
-  char message[100];
-  if (!client.connected())
-  {
-    reconnect();
-  }
-  if (!client.publish(topic, data))
-  {
-    snprintf(message, 100, "Failed to publish into %s\n", topic);
-    Serial.println(message);
-  }
-  else
-  {
-    snprintf(message, 100, "Successfully publish %s into %s\n", data, topic);
-    Serial.println(message);
-  }
-}
-
-void try_publish_float(const char *topic, float data)
-{
-  sensor_data = convert_float_to_string(data, sensor_data);
-  try_publish(topic, sensor_data);
-}
-
-// MQTT callback
-void callback(char* topic, byte* payload, unsigned int length)
-{
-  Serial.println("Message received !");
-}
-
-// Reconnect ESP32 to the MQTT server
-void reconnect()
-{
-  if (!client.connect(MQTT_DEVICE_ID))
-  {
-    static char message[100];
-    snprintf(message, 100, "Failed to connect to MQTT broker, error [%i] !", client.state());
-    Serial.println(message);
-  }
-  else
-  {
-    Serial.println("Successfully connected to MQTT broker !");
-  }
 }
 
 // Setup MQ135
@@ -200,45 +125,11 @@ void loop() {
   }
 
   // [DHT22]
-
-  // Read humidity
-  try_publish_float("esp32/out/humidity", dht.readHumidity());
-  // Read temperature
-  try_publish_float("esp32/out/temperature", dht.readTemperature());
+  get_dht22_data();
 
   // [MQ135]
-
-  MQ135.update();
-
-  // Get CO
-  MQ135.setA(605.18); MQ135.setB(-3.937);
-  try_publish_float("esp32/out/co", MQ135.readSensor());
-
-  // Get Alcohol
-  MQ135.setA(77.255); MQ135.setB(-3.18);
-  try_publish_float("esp32/out/alcohol", MQ135.readSensor());
-
-  // Get co2
-  MQ135.setA(110.47); MQ135.setB(-2.862);
-  try_publish_float("esp32/out/co2", MQ135.readSensor() + 400);
-
-  // Get Toluen
-  MQ135.setA(44.947); MQ135.setB(-3.445);
-  try_publish_float("esp32/out/toluen", MQ135.readSensor());
-
-  // Get NH4
-  MQ135.setA(102.2 ); MQ135.setB(-2.473);
-  try_publish_float("esp32/out/nh4", MQ135.readSensor());
-
-  // Get Aceton
-  MQ135.setA(34.668); MQ135.setB(-3.369);
-  try_publish_float("esp32/out/aceton", MQ135.readSensor());
+  get_mq135_data();
 
   // [BMP180]
-
-  // Air pressure
-  try_publish_float("esp32/out/pressure", bmp180.readPressure());
-
-  // Altitude (considering that sea level has pressure of 10132 Pascal)
-  try_publish_float("esp32/out/altitude", bmp180.readAltitude());
+  get_bmp180_data();
 }
