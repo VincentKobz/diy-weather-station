@@ -9,8 +9,6 @@
 
 ## Description of the project
 
-DIY weather station with 
-
 The goal is to build from scratch a small intelligent weather station that can be connected to **IOT** networks.
 
 It features the following sensors:
